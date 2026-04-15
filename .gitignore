@@ -1,0 +1,5 @@
+outputs/video/
+outputs/images/
+outputs/tex/
+__pycache__/
+*.pyc
