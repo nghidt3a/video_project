@@ -8,8 +8,9 @@ import numpy as np
 class SVDStep2Sigma(BaseThreeDScene):
     def construct(self):
         A = np.array(A_DEMO, dtype=float)
-        U_full, s, Vt = np.linalg.svd(A, full_matrices=True)
+        _, s, _ = np.linalg.svd(A, full_matrices=True)
         s1, s2 = float(s[0]), float(s[1])
+        z_scale = 0.9
 
         self.set_camera_orientation(phi=70 * DEGREES, theta=-60 * DEGREES)
 
@@ -27,12 +28,22 @@ class SVDStep2Sigma(BaseThreeDScene):
         basis = VGroup(vec_e1, vec_e2)
 
         SCALE = 1.0
-        unit_circle = Circle(radius=SCALE, color=WHITE, stroke_width=2)
-        result_ellipse = Ellipse(width=2 * s1 * SCALE, height=2 * s2 * SCALE,
-                                 color=WHITE, stroke_width=2)
+        unit_shape = Sphere(radius=SCALE, resolution=(20, 20))
+        unit_shape.set_fill(opacity=0.2)
+        unit_shape.set_stroke(width=0.8)
+        result_ellipsoid = Surface(
+            lambda u, v: np.array([
+                s1 * SCALE * np.cos(u) * np.sin(v),
+                s2 * SCALE * np.sin(u) * np.sin(v),
+                z_scale * SCALE * np.cos(v),
+            ]),
+            u_range=[0, TAU], v_range=[0, PI],
+            resolution=(20, 20),
+            fill_opacity=0.2, stroke_width=0.8,
+        )
 
-        axis_major = Arrow(ORIGIN, RIGHT * s1 * SCALE, color=COLOR_SIGMA, buff=0, stroke_width=3)
-        axis_minor = Arrow(ORIGIN, UP * s2 * SCALE, color=COLOR_SIGMA, buff=0, stroke_width=3)
+        axis_major = Arrow3D(ORIGIN, RIGHT * s1 * SCALE, color=COLOR_SIGMA)
+        axis_minor = Arrow3D(ORIGIN, UP * s2 * SCALE, color=COLOR_SIGMA)
         label_s1 = MathTex(rf"\sigma_1 \approx {s1:.1f}", font_size=26, color=COLOR_SIGMA)
         label_s2 = MathTex(rf"\sigma_2 \approx {s2:.1f}", font_size=26, color=COLOR_SIGMA)
         self.fix(label_s1)
@@ -46,7 +57,7 @@ class SVDStep2Sigma(BaseThreeDScene):
 
         self.add(axes)
         self.play(FadeIn(step_label), run_time=0.6)
-        self.play(Create(unit_circle), *[Create(a) for a in basis], run_time=1)
+        self.play(Create(unit_shape), *[Create(a) for a in basis], run_time=1)
         self.wait(0.5)
 
         self.move_camera(phi=70 * DEGREES, theta=-60 * DEGREES, run_time=1.2)
@@ -55,7 +66,7 @@ class SVDStep2Sigma(BaseThreeDScene):
         new_e1 = Arrow3D(ORIGIN, RIGHT * s1, color=COLOR_U)
         new_e2 = Arrow3D(ORIGIN, UP * s2, color=COLOR_V)
         self.play(
-            Transform(unit_circle, result_ellipse),
+            Transform(unit_shape, result_ellipsoid),
             Transform(vec_e1, new_e1),
             Transform(vec_e2, new_e2),
             run_time=2,
@@ -63,8 +74,8 @@ class SVDStep2Sigma(BaseThreeDScene):
         self.wait(0.5)
 
         self.play(
-            GrowArrow(axis_major), FadeIn(label_s1),
-            GrowArrow(axis_minor), FadeIn(label_s2),
+            Create(axis_major), FadeIn(label_s1),
+            Create(axis_minor), FadeIn(label_s2),
             run_time=1,
         )
         self.wait(1.2)

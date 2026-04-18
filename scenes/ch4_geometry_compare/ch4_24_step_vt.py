@@ -1,74 +1,59 @@
 from manim import *
 from config.constants import *
 from utils.helpers import *
-from utils.base_scene import BaseScene, BaseThreeDScene
+from utils.base_scene import BaseThreeDScene
 import numpy as np
 
 
-class SVDStep1VTranspose(BaseScene):
+class SVDStep1VTranspose(BaseThreeDScene):
     def construct(self):
-        self.title_banner("Bước 1: Vᵀ — Xoay", color=COLOR_V)
+        self.set_camera_orientation(phi=68 * DEGREES, theta=-50 * DEGREES)
+        title = vn_text("Bước 1: Vᵀ — Xoay", size=28, color=COLOR_V)
+        self.fix(title)
+        title.to_corner(UL, buff=0.4)
 
         A = np.array(A_DEMO, dtype=float)
-        U, s, Vt = np.linalg.svd(A, full_matrices=True)
+        _, _, Vt = np.linalg.svd(A, full_matrices=True)
         V = Vt.T
         v1 = V[:, 0]
         v2 = V[:, 1]
         angle_vt = np.arctan2(v1[1], v1[0])
 
-        plane = NumberPlane(
-            x_range=[-4, 4, 1], y_range=[-3, 3, 1],
-            background_line_style={"stroke_opacity": 0.4, "stroke_width": 1},
-        ).scale(0.9)
-
-        basis = tracked_basis(plane, colors=(COLOR_U, COLOR_V))
-
-        unit_circle = Circle(radius=plane.get_x_unit_size(), color=WHITE, stroke_width=2)
-        unit_circle.move_to(plane.get_origin())
-
-        vec_v1 = Arrow(
-            plane.get_origin(),
-            plane.get_origin() + np.append(v1, 0) * plane.get_x_unit_size(),
-            color=COLOR_ACCENT, stroke_width=2.5, buff=0,
+        axes = ThreeDAxes(
+            x_range=[-4, 4], y_range=[-4, 4], z_range=[-2, 2],
+            axis_config={"stroke_width": 1, "color": GRAY},
         )
-        vec_v2 = Arrow(
-            plane.get_origin(),
-            plane.get_origin() + np.append(v2, 0) * plane.get_x_unit_size(),
-            color=COLOR_ACCENT, stroke_width=2.5, buff=0,
-        )
-        label_v1 = MathTex(r"v_1", font_size=24).next_to(vec_v1.get_end(), UR, buff=0.1)
-        label_v2 = MathTex(r"v_2", font_size=24).next_to(vec_v2.get_end(), UL, buff=0.1)
+        self.add(axes)
+
+        sphere = Sphere(radius=1.4, resolution=(20, 20))
+        sphere.set_fill(opacity=0.18)
+        sphere.set_stroke(width=0.8)
+        vec_v1 = Arrow3D(ORIGIN, np.array([v1[0], v1[1], 0]) * 1.4, color=COLOR_ACCENT)
+        vec_v2 = Arrow3D(ORIGIN, np.array([v2[0], v2[1], 0]) * 1.4, color=COLOR_ACCENT)
+        marker = Dot3D(point=np.array([1.4, 0, 0]), color=COLOR_SIGMA, radius=0.06)
 
         note = VGroup(
-            VGroup(MathTex(r"V^T:", font_size=28, color=COLOR_V),
-                   vn_text("quay thuần túy", size=28)).arrange(RIGHT, buff=0.15),
-            VGroup(vn_text("Vòng tròn vẫn là vòng tròn", size=26),
-                   MathTex(r"\checkmark", font_size=26, color=COLOR_SIGMA)).arrange(RIGHT, buff=0.15),
-        ).arrange(DOWN, buff=0.2).to_edge(RIGHT).shift(DOWN * 0.5)
+            VGroup(MathTex(r"V^T", font_size=30, color=COLOR_V), vn_text("chỉ xoay trong mặt phẳng", size=28)).arrange(RIGHT, buff=0.15),
+            VGroup(vn_text("Hình cầu vẫn giữ nguyên hình dạng", size=24), MathTex(r"\checkmark", font_size=24, color=COLOR_SIGMA)).arrange(RIGHT, buff=0.15),
+        ).arrange(DOWN, buff=0.18)
+        self.fix(note)
+        note.to_corner(DR, buff=0.45)
 
-        self.play(Create(plane), Create(unit_circle), run_time=1.0)
-        self.play(*[GrowArrow(a) for a in basis], run_time=0.8)
-        self.play(
-            GrowArrow(vec_v1), FadeIn(label_v1),
-            GrowArrow(vec_v2), FadeIn(label_v2),
-            run_time=1,
-        )
-        self.wait(1.5)
+        step_label = vn_text("Bước 1: chỉ quay, không méo", size=22, color=COLOR_V)
+        self.fix(step_label)
+        step_label.to_corner(DL, buff=0.45)
 
-        world = VGroup(plane, unit_circle, vec_v1, vec_v2, label_v1, label_v2)
+        self.play(FadeIn(title), FadeIn(sphere), Create(vec_v1), Create(vec_v2), Create(marker), FadeIn(step_label), run_time=1.0)
+        self.wait(0.6)
+
+        world = VGroup(sphere, vec_v1, vec_v2, marker)
         self.play(
-            Rotate(world, angle=-angle_vt, about_point=plane.get_origin()),
-            run_time=2,
+            Rotate(world, angle=-angle_vt, axis=OUT, about_point=ORIGIN),
+            run_time=2.0,
         )
-        self.wait(1)
+        self.wait(0.8)
 
         self.play(FadeIn(note), run_time=0.8)
         self.wait(1.5)
-
-        self.play(
-            FadeOut(note),
-            FadeOut(vec_v1), FadeOut(vec_v2),
-            FadeOut(label_v1), FadeOut(label_v2),
-            run_time=0.7,
-        )
+        self.play(FadeOut(VGroup(title, note, step_label, world, axes)), run_time=0.8)
         self.end_pause(1)

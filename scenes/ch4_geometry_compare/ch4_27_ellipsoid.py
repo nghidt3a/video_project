@@ -16,7 +16,7 @@ class SVDEllipsoidPrinciple(BaseThreeDScene):
         title = VGroup(
             vn_text("Nguyên lý Ellipsoid", size=30),
             MathTex(r"\mathbb{R}^n \xrightarrow{A} \mathbb{R}^m",
-                    font_size=26, color=COLOR_SIGMA),
+                font_size=26, color=COLOR_SIGMA),
         ).arrange(RIGHT, buff=0.3)
         self.fix(title)
         title.to_edge(UP, buff=0.35)
@@ -25,22 +25,21 @@ class SVDEllipsoidPrinciple(BaseThreeDScene):
             x_range=[-3, 3], y_range=[-3, 3], z_range=[-3, 3],
             axis_config={"stroke_width": 1, "color": GRAY},
         )
+        self.add(axes)
+        self.play(Write(title), run_time=0.6)
 
-        # Rank-full sphere
+        # --- Trường hợp 1: Rank đầy đủ ---
+        lbl_full = vn_text("Rank đầy đủ: ellipsoid 3 trục", size=22, color=COLOR_SIGMA)
+        self.fix(lbl_full)
+        lbl_full.to_corner(DL, buff=0.5)
+
         sphere_full = Sphere(radius=1.0)
         sphere_full.set_fill(opacity=0.2)
         sphere_full.set_stroke(width=0.6)
-        sphere_full.move_to(LEFT * 2)
-
-        # Rank-deficient sphere (will collapse one axis)
-        sphere_rd = Sphere(radius=1.0)
-        sphere_rd.set_fill(opacity=0.2)
-        sphere_rd.set_stroke(width=0.6, color=COLOR_WARN)
-        sphere_rd.move_to(RIGHT * 2)
 
         ellipsoid_full = Surface(
             lambda u, v: np.array([
-                -2 + s1 * np.cos(u) * np.sin(v),
+                s1 * np.cos(u) * np.sin(v),
                 s2 * np.sin(u) * np.sin(v),
                 0.8 * np.cos(v),
             ]),
@@ -48,10 +47,39 @@ class SVDEllipsoidPrinciple(BaseThreeDScene):
             resolution=(18, 18),
             fill_opacity=0.2, stroke_width=0.5, stroke_color=WHITE,
         )
+        ellipsoid_full_mid = Surface(
+            lambda u, v: np.array([
+                (0.7 + 0.3 * s1) * np.cos(u) * np.sin(v),
+                (0.7 + 0.3 * s2) * np.sin(u) * np.sin(v),
+                0.9 * np.cos(v),
+            ]),
+            u_range=[0, TAU], v_range=[0, PI],
+            resolution=(18, 18),
+            fill_opacity=0.2, stroke_width=0.5, stroke_color=WHITE,
+        )
 
+        self.play(Create(sphere_full), run_time=1.2)
+        self.wait(0.5)
+        self.play(FadeIn(lbl_full), run_time=0.4)
+        self.play(Transform(sphere_full, ellipsoid_full_mid), run_time=1.2, rate_func=smooth)
+        self.play(Transform(sphere_full, ellipsoid_full), run_time=1.4, rate_func=smooth)
+        self.wait(2.0)
+
+        # --- Trường hợp 2: Rank thiếu ---
+        lbl_rd = vn_text("Rank thiếu: dẹt 1 trục", size=22, color=COLOR_WARN)
+        self.fix(lbl_rd)
+        lbl_rd.to_corner(DL, buff=0.5)
+
+        self.play(FadeOut(sphere_full), FadeOut(lbl_full), run_time=0.6)
+
+        sphere_rd = Sphere(radius=1.0)
+        sphere_rd.set_fill(opacity=0.2)
+        sphere_rd.set_stroke(width=0.6, color=COLOR_WARN)
+
+        # Ellipsoid dẹt (trục z → 0)
         ellipsoid_rd = Surface(
             lambda u, v: np.array([
-                2 + s1 * np.cos(u) * np.sin(v),
+                s1 * np.cos(u) * np.sin(v),
                 s2 * np.sin(u) * np.sin(v),
                 0.0 * np.cos(v),
             ]),
@@ -59,28 +87,26 @@ class SVDEllipsoidPrinciple(BaseThreeDScene):
             resolution=(18, 18),
             fill_opacity=0.2, stroke_width=0.5, stroke_color=COLOR_WARN,
         )
-
-        lbl_full = vn_text("Rank đầy đủ", size=20, color=COLOR_SIGMA)
-        lbl_rd = vn_text("Rank thiếu (một trục = 0)", size=20, color=COLOR_WARN)
-        self.fix(lbl_full)
-        self.fix(lbl_rd)
-        lbl_full.to_corner(DL, buff=0.5)
-        lbl_rd.to_corner(DR, buff=0.5)
-
-        self.add(axes)
-        self.play(Write(title), run_time=0.6)
-        self.play(Create(sphere_full), Create(sphere_rd), run_time=1.5)
-        self.wait(0.8)
-
-        self.play(
-            ReplacementTransform(sphere_full, ellipsoid_full),
-            ReplacementTransform(sphere_rd, ellipsoid_rd),
-            FadeIn(lbl_full), FadeIn(lbl_rd),
-            run_time=2.5,
+        ellipsoid_rd_mid = Surface(
+            lambda u, v: np.array([
+                s1 * np.cos(u) * np.sin(v),
+                s2 * np.sin(u) * np.sin(v),
+                0.25 * np.cos(v),
+            ]),
+            u_range=[0, TAU], v_range=[0, PI],
+            resolution=(18, 18),
+            fill_opacity=0.2, stroke_width=0.5, stroke_color=COLOR_WARN,
         )
-        self.wait(1.5)
 
-        note_rank = vn_text("rank(A) = số chiều của ellipsoid", color=COLOR_ACCENT)
+        self.play(Create(sphere_rd), run_time=1.2)
+        self.wait(0.5)
+        self.play(FadeIn(lbl_rd), run_time=0.4)
+        self.play(Transform(sphere_rd, ellipsoid_rd_mid), run_time=1.2, rate_func=smooth)
+        self.play(Transform(sphere_rd, ellipsoid_rd), run_time=1.4, rate_func=smooth)
+        self.wait(2.0)
+
+        # --- Kết luận ---
+        note_rank = vn_text("rank(A) quyết định số chiều còn lại của hình", color=COLOR_ACCENT)
         self.fix(note_rank)
         note_rank.to_edge(DOWN, buff=0.4)
 

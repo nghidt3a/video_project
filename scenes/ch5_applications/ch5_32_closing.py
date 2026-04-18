@@ -31,24 +31,27 @@ class SVDClosingSummary(BaseScene):
             self.wait(0.4)
         self.wait(1.5)
 
-        apps = VGroup(
+        row1 = VGroup(
             VGroup(
                 MarkupText("<b>1. Nén ảnh</b>", font=VN_FONT, font_size=28),
-                MathTex(r"A_k = \sum_{i=1}^{k} \sigma_i u_i v_i^T \approx A", font_size=26),
+                MathTex(r"A_k = \sum_{i=1}^{k} \sigma_i u_i v_i^T \approx A", font_size=24),
             ).arrange(DOWN, aligned_edge=LEFT, buff=0.12),
             VGroup(
                 MarkupText("<b>2. Hệ thống gợi ý</b>", font=VN_FONT, font_size=28),
                 vn_text("Netflix, Spotify: SVD của ma trận user-item", font_size=22),
             ).arrange(DOWN, aligned_edge=LEFT, buff=0.12),
+        ).arrange(RIGHT, buff=0.8, aligned_edge=UP)
+        row2 = VGroup(
             VGroup(
                 MarkupText("<b>3. Giả nghịch đảo</b>", font=VN_FONT, font_size=28),
-                MathTex(r"A^+ = V \Sigma^+ U^T", font_size=26),
+                MathTex(r"A^+ = V \Sigma^+ U^T", font_size=24),
             ).arrange(DOWN, aligned_edge=LEFT, buff=0.12),
             VGroup(
                 MarkupText("<b>4. PCA</b>", font=VN_FONT, font_size=28),
                 vn_text("SVD của ma trận dữ liệu đã trừ mean", font_size=22),
             ).arrange(DOWN, aligned_edge=LEFT, buff=0.12),
-        ).arrange(DOWN, aligned_edge=LEFT, buff=0.3).move_to(DOWN * 0.8)
+        ).arrange(RIGHT, buff=0.8, aligned_edge=UP)
+        apps = VGroup(row1, row2).arrange(DOWN, buff=0.5, aligned_edge=LEFT).move_to(DOWN * 0.7)
         safe_fit(apps)
         self.fix(apps)
 
@@ -58,17 +61,4 @@ class SVDClosingSummary(BaseScene):
             self.wait(2)
 
         self.play(FadeOut(apps), FadeOut(title), run_time=0.7)
-
-        tex = MathTex("A = U", "\\Sigma", "V^T", font_size=72)
-        color_mathtex_parts(tex, {1: COLOR_U, 2: COLOR_SIGMA, 3: COLOR_V})
-        tex.scale(1.8).move_to(ORIGIN)
-        safe_fit(tex)
-        self.fix(tex)
-
-        tex.set_opacity(0)
-        self.add(tex)
-        self.play(tex.animate.set_opacity(1), run_time=1.5)
-        self.play(Flash(tex, color=COLOR_ACCENT, flash_radius=2.0), run_time=1)
-        self.wait(2.5)
-        self.play(FadeOut(tex), run_time=1.5)
         self.end_pause(1)

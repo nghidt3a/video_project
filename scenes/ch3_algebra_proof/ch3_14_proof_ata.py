@@ -28,7 +28,8 @@ class SVDProofAtA(BaseScene):
                 self.wait(0.8)
                 self.play(FadeOut(box), FadeOut(note), run_time=0.4)
 
-        spectrum_note = vn_text("AᵀA đối xứng thực ⇒ chéo hóa trực giao", size=24, color=COLOR_MUTED).to_edge(DOWN, buff=0.35)
+        spectrum_note = vn_text("AᵀA đối xứng thực => chéo hóa trực giao", size=24, color=COLOR_MUTED)
+        spectrum_note.to_edge(DOWN, buff=0.35)
         self.play(FadeIn(spectrum_note), run_time=0.6)
         self.wait(2.2)
         self.play(FadeOut(Group(*self.mobjects)), run_time=0.8)

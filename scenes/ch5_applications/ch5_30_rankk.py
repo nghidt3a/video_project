@@ -46,7 +46,7 @@ class SVDRank1Approximation(BaseScene):
         formula = MathTex(
             r"A_k = \sum_{i=1}^{k} \sigma_i\, u_i v_i^T",
             font_size=32, color=COLOR_SIGMA,
-        ).next_to(title, DOWN, buff=0.2)
+        ).next_to(title, DOWN, buff=0.1).shift(UP * 1.2)
         self.fix(formula)
 
         self.play(FadeIn(formula), run_time=0.6)
@@ -58,10 +58,8 @@ class SVDRank1Approximation(BaseScene):
             if arr.ndim == 3:
                 arr = arr[..., :3].mean(axis=2)
             A = arr / max(arr.max(), 1.0)
-            use_image = True
         except Exception:
             A = np.random.rand(16, 16)
-            use_image = False
 
         U, S, Vt = np.linalg.svd(A, full_matrices=False)
         r = len(S)
@@ -70,15 +68,18 @@ class SVDRank1Approximation(BaseScene):
         def approx(k):
             return np.clip(U[:, :k] @ np.diag(S[:k]) @ Vt[:k, :], 0, 1)
 
+        def arr_to_image(arr, height=2.75):
+            gray = (np.clip(arr, 0, 1) * 255).astype(np.uint8)
+            rgb = np.stack([gray] * 3, axis=-1)
+            mob = ImageMobject(rgb)
+            mob.set(height=height)
+            return mob
+
         orig_label = vn_text("Ảnh gốc", font_size=26)
         approx_label = vn_text("Rank-k", font_size=26)
 
-        if use_image:
-            orig_mob = ImageMobject("assets/logo.png").set(height=3.0).move_to(LEFT * 3.2 + UP * 0.3)
-            cur_mob = ImageMobject("assets/logo.png").set(height=3.0).move_to(RIGHT * 3.2 + UP * 0.3)
-        else:
-            orig_mob = make_heatmap(A).move_to(LEFT * 3.2 + UP * 0.3)
-            cur_mob = make_heatmap(A).move_to(RIGHT * 3.2 + UP * 0.3)
+        orig_mob = arr_to_image(A).move_to(LEFT * 3.2 + DOWN * 0.05)
+        cur_mob  = arr_to_image(A).move_to(RIGHT * 3.2 + DOWN * 0.05)
 
         orig_label.next_to(orig_mob, UP, buff=0.2)
         approx_label.next_to(cur_mob, UP, buff=0.2)
@@ -90,14 +91,14 @@ class SVDRank1Approximation(BaseScene):
         bar_w = 8.0
         bar_h = 0.3
         track = Rectangle(width=bar_w, height=bar_h, stroke_color=COLOR_MUTED,
-                          stroke_width=2, fill_opacity=0).move_to(DOWN * 2.8)
+                          stroke_width=2, fill_opacity=0).to_edge(DOWN, buff=0.35)
         fill = Rectangle(width=0.01, height=bar_h, stroke_width=0,
                          fill_color=COLOR_ACCENT, fill_opacity=1.0)
         fill.align_to(track, LEFT).align_to(track, DOWN)
         self.fix(track, fill)
         self.play(Create(track), run_time=0.4)
 
-        pct_label = vn_text("Năng lượng: 0%", font_size=24).next_to(track, UP, buff=0.15)
+        pct_label = vn_text("Năng lượng: 0%", font_size=24).next_to(track, UP, buff=0.1)
         self.fix(pct_label)
         self.play(FadeIn(pct_label), run_time=0.3)
 
@@ -109,10 +110,7 @@ class SVDRank1Approximation(BaseScene):
             Ak = approx(k)
             pct = float(np.sum(S[:k] ** 2) / total_energy)
 
-            if use_image:
-                new_mob = make_heatmap(Ak).set(height=3.0).move_to(cur_mob.get_center())
-            else:
-                new_mob = make_heatmap(Ak).move_to(cur_mob.get_center())
+            new_mob = arr_to_image(Ak).move_to(cur_mob.get_center())
 
             new_fill = Rectangle(
                 width=max(bar_w * pct, 0.01), height=bar_h,

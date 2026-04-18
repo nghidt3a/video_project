@@ -2,8 +2,6 @@
 from __future__ import annotations
 
 import numpy as np
-import json
-import time
 from manim import (
     VGroup, RoundedRectangle, Rectangle, Text, MathTex, Arrow, Line, DashedLine,
     Square, Circle, FadeIn, FadeOut, Write, Create, Indicate, AnimationGroup,
@@ -16,29 +14,6 @@ from config.constants import (
     COLOR_U, COLOR_SIGMA, COLOR_V, VN_FONT, SAFE_MARGIN, DEFAULT_CARD_WIDTH,
 )
 
-_DEBUG_LOG_PATH = r"d:\Documents\HCMUS-LAB\Final_Manim_SVD\debug-9282c1.log"
-
-
-def _agent_log(hypothesis_id: str, location: str, message: str, data: dict):
-    # #region agent log
-    with open(_DEBUG_LOG_PATH, "a", encoding="utf-8") as _f:
-        _f.write(
-            json.dumps(
-                {
-                    "sessionId": "9282c1",
-                    "runId": "initial",
-                    "hypothesisId": hypothesis_id,
-                    "location": location,
-                    "message": message,
-                    "data": data,
-                    "timestamp": int(time.time() * 1000),
-                },
-                ensure_ascii=False,
-            )
-            + "\n"
-        )
-    # #endregion
-
 
 # ---------------------------------------------------------------------------
 def vn_text(text: str, size: float = 32, weight: str = "NORMAL",
@@ -46,19 +21,7 @@ def vn_text(text: str, size: float = 32, weight: str = "NORMAL",
     """Shortcut Text with VN font."""
     if "font_size" in kwargs:
         incoming_font_size = kwargs.pop("font_size")
-        resolved_size = size if size != 32 else incoming_font_size
-        _agent_log(
-            "H6",
-            "utils/helpers.py:vn_text",
-            "vn_text resolved font_size input",
-            {
-                "textPreview": text[:30],
-                "sizeArg": size,
-                "font_size_kwarg": incoming_font_size,
-                "resolvedSize": resolved_size,
-            },
-        )
-        size = resolved_size
+        size = size if size != 32 else incoming_font_size
     return Text(text, font=VN_FONT, weight=weight, color=color,
                 font_size=size, **kwargs)
 
@@ -225,4 +188,4 @@ def color_mathtex_parts(tex: MathTex, parts_colors: dict[int, str]) -> MathTex:
 
 # ---------------------------------------------------------------------------
 def sigma_badge(i: int) -> VGroup:
-    return make_badge(f"σ{i} khớp ✓", color=COLOR_SIGMA)
+    return make_badge(f"sigma{i} khop", color=COLOR_SIGMA)

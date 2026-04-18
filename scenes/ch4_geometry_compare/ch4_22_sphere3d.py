@@ -36,7 +36,11 @@ class SVDSphereTransform3D(BaseThreeDScene):
         self.play(FadeIn(title), Create(sphere), run_time=1.2)
         self.wait(0.8)
 
-        step1 = vn_text("① Vᵀ: Căn chỉnh singular vectors", size=20, color=COLOR_U)
+        step1 = VGroup(
+            vn_text("1)", size=20, color=COLOR_U),
+            MathTex(r"V^T", font_size=28, color=COLOR_U),
+            vn_text(": Căn chỉnh singular vectors", size=20, color=COLOR_U),
+        ).arrange(RIGHT, buff=0.08, aligned_edge=DOWN)
         self.fix(step1)
         step1.to_corner(DL, buff=0.5)
 
@@ -49,7 +53,11 @@ class SVDSphereTransform3D(BaseThreeDScene):
         )
         self.wait(0.5)
 
-        step2 = vn_text("② Σ: Kéo giãn theo 3 trục chính", size=20, color=COLOR_SIGMA)
+        step2 = VGroup(
+            vn_text("2)", size=20, color=COLOR_SIGMA),
+            MathTex(r"\Sigma", font_size=28, color=COLOR_SIGMA),
+            vn_text(": Kéo giãn theo 3 trục chính", size=20, color=COLOR_SIGMA),
+        ).arrange(RIGHT, buff=0.08, aligned_edge=DOWN)
         self.fix(step2)
         step2.to_corner(DL, buff=0.5)
 
@@ -72,7 +80,12 @@ class SVDSphereTransform3D(BaseThreeDScene):
         )
         self.wait(0.8)
 
-        step3 = vn_text("③ U: Quay về không gian ℝᵐ", size=20, color=COLOR_V)
+        step3 = VGroup(
+            vn_text("3)", size=20, color=COLOR_V),
+            MathTex(r"U", font_size=28, color=COLOR_V),
+            vn_text(": Quay về không gian", size=20, color=COLOR_V),
+            MathTex(r"\mathbb{R}^m", font_size=28, color=COLOR_V),
+        ).arrange(RIGHT, buff=0.08, aligned_edge=DOWN)
         self.fix(step3)
         step3.to_corner(DL, buff=0.5)
 

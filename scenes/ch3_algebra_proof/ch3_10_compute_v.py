@@ -32,16 +32,12 @@ class SVDComputeStepByStep(BaseScene):
             r"= \begin{pmatrix} 17 & 12 & 2 \\ 12 & 13 & -2 \\ 2 & -2 & 8 \end{pmatrix}",
             font_size=36,
         ).next_to(AtA_expand, DOWN, buff=0.4)
-        sym_note = vn_text("(Đối xứng → Định lý Phổ áp dụng được)", size=22, color=COLOR_MUTED)
-        sym_note.next_to(AtA_result, DOWN, buff=0.3)
-
         self.play(Write(AtA_expand), run_time=1.2)
         self.wait(0.5)
         self.play(TransformFromCopy(AtA_expand, AtA_result), run_time=1)
-        self.play(FadeIn(sym_note, shift=UP * 0.1), run_time=0.5)
-        self.wait(2)
+        self.wait(1.7)
 
-        self.play(FadeOut(AtA_expand), FadeOut(AtA_result), FadeOut(sym_note), FadeOut(badge1), run_time=0.5)
+        self.play(FadeOut(AtA_expand), FadeOut(AtA_result), FadeOut(badge1), run_time=0.5)
 
         # VO cue: phase 2 eigenvalues
         badge2 = step_badge("Giai đoạn 2 / 3")
@@ -78,7 +74,7 @@ class SVDComputeStepByStep(BaseScene):
         self.wait(0.5)
 
         # VO cue: lambda_3 = 0 warning
-        zero_note = vn_text("λ=0 → chiều bị ép dẹt", color=COLOR_WARN).scale(0.9)
+        zero_note = vn_text("\u03bb=0 \u2192 chiều bị ép dẹt", color=COLOR_WARN).scale(0.9)
         zero_note.next_to(box_eig, DOWN, buff=0.25).shift(RIGHT * 2.0)
         self.play(FadeIn(zero_note, shift=UP * 0.1), run_time=0.6)
         self.wait(1.2)
@@ -97,7 +93,7 @@ class SVDComputeStepByStep(BaseScene):
         self.play(Sigma_mat.animate.to_corner(DL, buff=0.5).scale(0.8), run_time=0.8)
 
         # VO cue: phase 3 eigenvectors -> V
-        badge3 = step_badge("Giai đoạn 3 / 3", color=COLOR_V)
+        badge3 = step_badge("Giai đoạn 3 / 3", color=WHITE)
         self.play(FadeIn(badge3), run_time=0.3)
 
         ev_title = vn_text("Vector riêng của AᵀA → cột của V", size=26)
@@ -106,33 +102,66 @@ class SVDComputeStepByStep(BaseScene):
         self.play(FadeIn(ev_title), run_time=0.5)
 
         eigvec_group = VGroup(
-            MathTex(r"\lambda_1=25:\; v_1 = \tfrac{1}{\sqrt{2}}\begin{pmatrix}1\\1\\0\end{pmatrix}", font_size=30, color=COLOR_V),
-            MathTex(r"\lambda_2=9:\; v_2 = \tfrac{1}{\sqrt{2}}\begin{pmatrix}-1\\1\\0\end{pmatrix}", font_size=30, color=COLOR_V),
-            MathTex(r"\lambda_3=0:\; v_3 = \begin{pmatrix}0\\0\\-1\end{pmatrix}", font_size=30, color=COLOR_MUTED),
-        ).arrange(DOWN, buff=0.3, aligned_edge=LEFT).move_to(LEFT * 2.5)
+            MathTex(r"\lambda_1=25:\; v_1 = \tfrac{1}{\sqrt{2}}\begin{pmatrix}1\\1\\0\end{pmatrix}", font_size=30, color=WHITE),
+            MathTex(r"\lambda_2=9:\; v_2 = \tfrac{1}{\sqrt{2}}\begin{pmatrix}-1\\1\\0\end{pmatrix}", font_size=30, color=WHITE),
+            MathTex(r"\lambda_3=0:\; v_3 = \begin{pmatrix}0\\0\\-1\end{pmatrix}", font_size=30, color=WHITE),
+        ).arrange(DOWN, buff=0.28, aligned_edge=LEFT)
 
-        V_mat = MathTex(
+        V_label = MathTex(r"V =", font_size=44, color=WHITE)
+        V_cols = VGroup(
+            MathTex(r"\tfrac{1}{\sqrt{2}}\begin{pmatrix}1\\1\\0\end{pmatrix}", font_size=34, color=WHITE),
+            MathTex(r"\tfrac{1}{\sqrt{2}}\begin{pmatrix}-1\\1\\0\end{pmatrix}", font_size=34, color=WHITE),
+            MathTex(r"\begin{pmatrix}0\\0\\-1\end{pmatrix}", font_size=34, color=WHITE),
+        ).arrange(RIGHT, buff=0.45)
+        V_brackets = MathTex(r"\left(\quad\quad\quad\quad\quad\quad\right)", font_size=64, color=WHITE)
+        V_brackets.stretch_to_fit_height(V_cols.height + 0.35)
+        V_cols.move_to(V_brackets)
+        V_fly = VGroup(V_label, V_brackets).arrange(RIGHT, buff=0.2)
+
+        V_mat_final = MathTex(
             r"V = \begin{pmatrix}"
-            r"\tfrac{1}{\sqrt{2}} & \tfrac{-1}{\sqrt{2}} & 0 \\"
-            r"\tfrac{1}{\sqrt{2}} & \tfrac{1}{\sqrt{2}} & 0 \\"
+            r"\tfrac{1}{\sqrt{2}} & \tfrac{-1}{\sqrt{2}} & 0 \\" 
+            r"\tfrac{1}{\sqrt{2}} & \tfrac{1}{\sqrt{2}} & 0 \\" 
             r"0 & 0 & -1"
             r"\end{pmatrix}",
-            font_size=36, color=COLOR_V,
-        ).move_to(RIGHT * 3)
+            font_size=36,
+            color=WHITE,
+        )
+        V_mat_final.move_to(V_fly)
 
-        arrow_to_V = Arrow(eigvec_group.get_right() + RIGHT * 0.2, V_mat.get_left() + LEFT * 0.2, color=WHITE)
+        content_row = VGroup(eigvec_group, V_fly).arrange(RIGHT, buff=1.0, aligned_edge=UP)
+        safe_fit(content_row, max_w=config.frame_width - 1.2, max_h=config.frame_height - 3.2)
+        content_row.move_to(ORIGIN + DOWN * 0.3)
+        V_cols.move_to(V_brackets)
+        V_mat_final.move_to(V_fly)
 
         for vec in eigvec_group:
-            self.play(FadeIn(vec, shift=RIGHT * 0.2), run_time=0.6)
-        self.wait(0.3)
+            self.play(FadeIn(vec, shift=RIGHT * 0.2), run_time=1.0)
+        self.wait(0.5)
 
-        # VO cue: v_3 degenerate — warn again
-        zero_note2 = vn_text("λ=0 → chiều bị ép dẹt", color=COLOR_WARN).scale(0.85)
-        zero_note2.next_to(eigvec_group[2], DOWN, buff=0.2, aligned_edge=LEFT)
-        self.play(FadeIn(zero_note2), run_time=0.5)
-        self.wait(0.8)
-
-        self.play(GrowArrow(arrow_to_V), TransformFromCopy(eigvec_group, V_mat), run_time=1.5)
+        self.play(FadeIn(V_fly, shift=RIGHT * 0.1), run_time=0.6)
+        self.play(
+            LaggedStart(
+                AnimationGroup(
+                    TransformFromCopy(eigvec_group[0], V_cols[0], run_time=0.9),
+                    FadeOut(V_cols[0], run_time=0.9),
+                    lag_ratio=0.0,
+                ),
+                AnimationGroup(
+                    TransformFromCopy(eigvec_group[1], V_cols[1], run_time=0.9),
+                    FadeOut(V_cols[1], run_time=0.9),
+                    lag_ratio=0.0,
+                ),
+                AnimationGroup(
+                    TransformFromCopy(eigvec_group[2], V_cols[2], run_time=0.9),
+                    FadeOut(V_cols[2], run_time=0.9),
+                    lag_ratio=0.0,
+                ),
+                lag_ratio=0.15,
+            ),
+            run_time=1.5,
+        )
+        self.play(FadeOut(V_fly), FadeIn(V_mat_final), run_time=0.6)
         self.wait(2.5)
 
         self.play(FadeOut(Group(*self.mobjects)), run_time=0.8)

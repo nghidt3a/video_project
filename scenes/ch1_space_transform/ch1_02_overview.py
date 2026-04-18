@@ -6,81 +6,51 @@ from utils.base_scene import BaseScene, BaseThreeDScene
 
 class SVDOverviewScene(BaseScene):
     def construct(self):
-        # VO cue: gioi thieu cong thuc A = U Sigma V^T
         formula = MathTex(
-            r"A \;=\; ", r"U", r"\;\Sigma\;", r"V^T",
-            font_size=56,
+            r"A = U \Sigma V^{T}",
+            font_size=64,
         )
-        formula[1].set_color(COLOR_U)
-        formula[2].set_color(COLOR_SIGMA)
-        formula[3].set_color(COLOR_V)
-        formula.move_to(UP * 3.1)
+        formula[0][0].set_color(COLOR_ACCENT)  # A
+        formula[0][2].set_color(COLOR_U)        # U
+        formula[0][3:6].set_color(COLOR_SIGMA)  # Sigma
+        formula[0][7:9].set_color(COLOR_V)      # V^T
+        formula.to_edge(UP, buff=0.4)
 
-        card_u = make_card(
-            title=r"U \in \mathbb{R}^{m \times m}",
-            body=[r"U^T U = I_m", r"A v_i = \sigma_i u_i"],
-            width=4.2,
-            color=COLOR_U,
-        )
-        card_s = make_card(
-            title=r"\Sigma \in \mathbb{R}^{m \times n}",
-            body=[
-                r"\sigma_1 \ge \sigma_2 \ge \cdots \ge \sigma_r > 0",
-                r"\mathrm{diag}(\sigma_1,\sigma_2,\ldots,\sigma_r,0,\ldots)",
-            ],
-            width=4.6,
-            color=COLOR_SIGMA,
-        )
-        card_v = make_card(
-            title=r"V \in \mathbb{R}^{n \times n}",
-            body=[r"V^T V = I_n", r"A^T u_i = \sigma_i v_i"],
-            width=4.2,
-            color=COLOR_V,
-        )
+        self.play(FadeIn(formula), run_time=1.0)
+        self.wait(1.0)
 
-        for c in (card_u, card_s, card_v):
-            safe_fit(c, max_w=4.6, max_h=2.6)
+        u_desc = VGroup(
+            MathTex(r"U \in \mathbb{R}^{m \times m}", font_size=30, color=COLOR_U),
+            MathTex(r"U^T U = I_m", font_size=28, color=COLOR_TEXT),
+            vn_text("Ma trận trực giao", size=26, color=COLOR_MUTED),
+        ).arrange(DOWN, buff=0.25, aligned_edge=LEFT)
+        u_desc.move_to(LEFT * 4.35 + DOWN * 0.55)
 
-        card_u.move_to(LEFT * 4.6 + DOWN * 1.1)
-        card_s.move_to(ORIGIN + DOWN * 1.1)
-        card_v.move_to(RIGHT * 4.6 + DOWN * 1.1)
+        self.play(FadeIn(u_desc, shift=LEFT * 0.3), run_time=1.0)
+        self.wait(1.6)
 
-        sym_u = formula[1]
-        sym_s = formula[2]
-        sym_v = formula[3]
+        sigma_desc = VGroup(
+            MathTex(r"\Sigma \in \mathbb{R}^{m \times n}", font_size=30, color=COLOR_SIGMA),
+            MathTex(r"\sigma_1 \geq \sigma_2 \geq \cdots \geq 0", font_size=28, color=COLOR_TEXT),
+            vn_text("Ma trận đường chéo", size=26, color=COLOR_MUTED),
+        ).arrange(DOWN, buff=0.25, aligned_edge=LEFT)
+        sigma_desc.move_to(DOWN * 0.45)
 
-        def mk_arrow(sym, card, color):
-            return Arrow(
-                sym.get_bottom() + DOWN * 0.05,
-                card.get_top() + UP * 0.05,
-                buff=0.10, color=color,
-                stroke_width=2.5,
-                max_tip_length_to_length_ratio=0.12,
-            )
+        self.play(FadeIn(sigma_desc, shift=DOWN * 0.3), run_time=1.0)
+        self.wait(1.6)
 
-        arr_u = mk_arrow(sym_u, card_u, COLOR_U)
-        arr_s = mk_arrow(sym_s, card_s, COLOR_SIGMA)
-        arr_v = mk_arrow(sym_v, card_v, COLOR_V)
+        v_desc = VGroup(
+            MathTex(r"V \in \mathbb{R}^{n \times n}", font_size=30, color=COLOR_V),
+            MathTex(r"V^T V = I_n", font_size=28, color=COLOR_TEXT),
+            vn_text("Ma trận trực giao", size=26, color=COLOR_MUTED),
+        ).arrange(DOWN, buff=0.25, aligned_edge=LEFT)
+        v_desc.move_to(RIGHT * 4.35 + DOWN * 0.55)
 
-        # VO cue: xuat hien cong thuc tong quat
-        self.play(FadeIn(formula), run_time=0.7)
-        self.wait(1.5)
+        self.play(FadeIn(v_desc, shift=RIGHT * 0.3), run_time=1.0)
+        self.wait(1.6)
 
-        # VO cue: U - ma tran truc giao, left singular vectors
-        self.play(GrowArrow(arr_u), FadeIn(card_u, shift=DOWN * 0.15), run_time=1.0)
-        self.wait(4)
-
-        # VO cue: Sigma - singular values giam dan
-        self.play(GrowArrow(arr_s), FadeIn(card_s, shift=DOWN * 0.15), run_time=1.0)
-        self.wait(4)
-
-        # VO cue: V - ma tran truc giao, right singular vectors
-        self.play(GrowArrow(arr_v), FadeIn(card_v, shift=DOWN * 0.15), run_time=1.0)
-        self.wait(5)
-
-        # VO cue: tom ket va chuyen canh
         self.play(
-            FadeOut(VGroup(arr_u, card_u, arr_s, card_s, arr_v, card_v)),
+            FadeOut(VGroup(formula, u_desc, sigma_desc, v_desc)),
             run_time=0.8,
         )
         self.end_pause(1)

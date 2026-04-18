@@ -96,18 +96,12 @@ class SVDNumericalExample(BaseScene):
 
         # VO cue: final Sigma result
         sigma_matrix = MathTex(
-            r"\Sigma = \begin{pmatrix} 3.62 & 0 \\ 0 & 1.38 \end{pmatrix}",
+            r"A = ()\cdot()\cdot()",
             font_size=46, color=COLOR_SIGMA,
-        )
-        result_row = VGroup(
-            mat_A.copy().scale(1.6),
-            MathTex(r"\Longrightarrow", font_size=40),
-            sigma_matrix,
-        ).arrange(RIGHT, buff=0.5).move_to(UP * 0.3)
-        safe_fit(result_row)
+        ).to_edge(DOWN, buff=0.55)
 
         self.play(FadeOut(mat_A), run_time=0.3)
-        self.play(FadeIn(result_row), run_time=1)
+        self.play(FadeIn(sigma_matrix), run_time=0.8)
         self.wait(2.5)
 
         self.play(FadeOut(Group(*self.mobjects)), run_time=0.8)

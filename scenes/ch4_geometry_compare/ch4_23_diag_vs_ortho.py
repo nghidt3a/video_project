@@ -109,14 +109,14 @@ class SVDDiagonalVsOrthogonal(BaseThreeDScene):
         conclusion = VGroup(
             VGroup(
                 MathTex(r"\Sigma:", font_size=30, color=COLOR_SIGMA),
-                vn_text("thay đổi hình dáng", size=26),
-            ).arrange(RIGHT, buff=0.2),
+                vn_text("thay đổi hình dạng", size=26),
+            ).arrange(RIGHT, buff=0.3, aligned_edge=DOWN),
             VGroup(
                 MathTex(r"U, V:", font_size=30, color=COLOR_U),
                 vn_text("thay đổi hướng", size=26),
-            ).arrange(RIGHT, buff=0.2),
+            ).arrange(RIGHT, buff=0.3, aligned_edge=DOWN),
             vn_text("SVD = kết hợp cả hai!", size=28, color=COLOR_ACCENT),
-        ).arrange(DOWN, buff=0.45)
+        ).arrange(DOWN, buff=0.5, aligned_edge=LEFT)
 
         self.fix(conclusion)
         conclusion.move_to(ORIGIN)
