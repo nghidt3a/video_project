@@ -36,7 +36,6 @@ SCENE_ORDER: list[tuple[str, str, str]] = [
     ("ch3_algebra_proof",   "ch3_10_compute_v",    "SVDComputeStepByStep"),
     ("ch3_algebra_proof",   "ch3_11_compute_u",    "SVDComputeU"),
     ("ch3_algebra_proof",   "ch3_12_assemble",     "SVDResultAssemble"),
-    ("ch3_algebra_proof",   "ch3_13_trans1",       "SVDChapterTransition1"),
     ("ch3_algebra_proof",   "ch3_14_proof_ata",    "SVDProofAtA"),
     ("ch3_algebra_proof",   "ch3_15_proof_aat",    "SVDProofAAt"),
     ("ch3_algebra_proof",   "ch3_16_rect_demo",    "SVDRectangularDemo"),
